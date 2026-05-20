@@ -1,0 +1,5 @@
+-- seed.sql — local development seed data.
+-- Runs after migrations on `supabase db reset`.
+--
+-- Phase 1 has no seed data: create users by signing up through the app so the
+-- handle_new_user() trigger and the full auth flow are exercised end to end.
