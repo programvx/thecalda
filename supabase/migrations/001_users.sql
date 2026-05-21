@@ -30,9 +30,9 @@ create table public.users (
   uid          uuid        not null default gen_random_uuid() unique,
   created_at   timestamptz not null default now(),
   updated_at   timestamptz not null default now(),
-  auth_user_id uuid        not null unique references auth.users (id) on delete cascade,
   email        text,
-  full_name    text
+  full_name    text,
+  auth_user_id uuid        not null unique references auth.users (id) on delete cascade
 );
 
 create trigger users_set_updated_at
