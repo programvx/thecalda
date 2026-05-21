@@ -3,6 +3,7 @@ package services
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 
@@ -46,4 +47,42 @@ func (s *ApiSrv) SendError(ctx *gin.Context, err *model.Err) {
 			Details: err.Details,
 		},
 	})
+}
+
+const (
+	defaultPage     = 1
+	defaultPageSize = 20
+	maxPageSize     = 100
+)
+
+// PaginationParams reads `page` and `pageSize` query parameters, applying
+// defaults and clamping them to sane bounds.
+func (s *ApiSrv) PaginationParams(ctx *gin.Context) (page, pageSize int) {
+	page = queryInt(ctx, "page", defaultPage)
+	if page < 1 {
+		page = defaultPage
+	}
+
+	pageSize = queryInt(ctx, "pageSize", defaultPageSize)
+	if pageSize < 1 {
+		pageSize = defaultPageSize
+	}
+	if pageSize > maxPageSize {
+		pageSize = maxPageSize
+	}
+	return page, pageSize
+}
+
+// queryInt reads an integer query parameter, falling back to def when the
+// parameter is absent or not a valid integer.
+func queryInt(ctx *gin.Context, key string, def int) int {
+	raw := ctx.Query(key)
+	if raw == "" {
+		return def
+	}
+	n, err := strconv.Atoi(raw)
+	if err != nil {
+		return def
+	}
+	return n
 }

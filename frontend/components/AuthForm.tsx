@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Logo } from "@/components/Logo";
 import { AppleIcon, FacebookIcon, GoogleIcon } from "@/components/BrandIcons";
@@ -11,7 +11,7 @@ import { AppleIcon, FacebookIcon, GoogleIcon } from "@/components/BrandIcons";
 export type AuthMode = "sign-in" | "sign-up";
 
 const inputClass =
-  "w-full rounded-lg border border-black/15 bg-transparent px-3 py-2 text-sm outline-none transition focus:border-foreground/40 focus:ring-2 focus:ring-foreground/10 dark:border-white/15";
+  "w-full rounded-lg border border-black/15 bg-transparent px-3 py-2 text-sm outline-none transition focus:border-foreground focus:shadow-md dark:border-white/15";
 
 const copy: Record<
   AuthMode,
@@ -75,13 +75,14 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
             options: { data: { full_name: fullName } },
           });
 
-    setLoading(false);
-
     if (error) {
       setError(error.message);
+      setLoading(false);
       return;
     }
 
+    // On success, keep `loading` true so the button stays disabled and the
+    // spinner stays visible right up until the redirect navigates away.
     router.push("/account");
     router.refresh();
   }
@@ -199,9 +200,14 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
             <button
               type="submit"
               disabled={loading}
-              className="mt-1 rounded-lg bg-foreground px-4 py-2.5 text-sm font-medium text-background transition hover:opacity-90 disabled:opacity-50"
+              aria-label={t.submit}
+              className="mt-1 flex items-center justify-center rounded-lg bg-foreground px-4 py-2.5 text-sm font-medium text-background transition hover:opacity-90 disabled:opacity-50"
             >
-              {loading ? "Please wait…" : t.submit}
+              {loading ? (
+                <LoaderCircle className="size-5 animate-spin" aria-hidden />
+              ) : (
+                t.submit
+              )}
             </button>
           </form>
         </div>

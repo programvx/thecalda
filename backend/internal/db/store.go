@@ -20,7 +20,8 @@ type Store struct {
 // NewStore opens and verifies a GORM connection against the given database URL.
 func NewStore(ctx context.Context, log *zap.Logger, databaseURL string) (*Store, error) {
 	gormDB, err := gorm.Open(postgres.Open(databaseURL), &gorm.Config{
-		Logger: gormlogger.Default.LogMode(gormlogger.Warn),
+		Logger:         gormlogger.Default.LogMode(gormlogger.Warn),
+		TranslateError: true,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("open database: %w", err)

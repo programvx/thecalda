@@ -27,3 +27,17 @@ type Pagination struct {
 	Total      int64 `json:"total"`
 	TotalPages int   `json:"totalPages"`
 }
+
+// NewPagination builds pagination metadata for a result set.
+func NewPagination(page, pageSize int, total int64) *Pagination {
+	totalPages := 0
+	if pageSize > 0 && total > 0 {
+		totalPages = int((total + int64(pageSize) - 1) / int64(pageSize))
+	}
+	return &Pagination{
+		Page:       page,
+		PageSize:   pageSize,
+		Total:      total,
+		TotalPages: totalPages,
+	}
+}
