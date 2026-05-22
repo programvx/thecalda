@@ -42,11 +42,15 @@ func main() {
 
 	// CRUD
 	catalogsCrud := crud.NewCatalogsCrud(store)
+	ordersCrud := crud.NewOrdersCrud(store)
+	orderItemsCrud := crud.NewOrderItemsCrud(store)
 	usersCrud := crud.NewUsersCrud(store)
 
 	// Services.
 	apiSrv := services.NewApiSrv()
 	catalogsSrv := services.NewCatalogsSrv(logger, catalogsCrud)
+	ordersSrv := services.NewOrdersSrv(logger, ordersCrud, usersCrud)
+	orderItemsSrv := services.NewOrderItemsSrv(logger, orderItemsCrud, ordersCrud, usersCrud)
 	usersSrv := services.NewUsersSrv(logger, usersCrud)
 
 	// Auth middleware (fetches the Supabase JWKS up front).
@@ -68,6 +72,8 @@ func main() {
 	// Routes — handler registration lives in the routers package.
 	catalogsHandler := handlers.NewCatalogsHandler(apiSrv, catalogsSrv)
 	healthHandler := handlers.NewHealthHandler(store)
+	ordersHandler := handlers.NewOrdersHandler(apiSrv, ordersSrv)
+	orderItemsHandler := handlers.NewOrderItemsHandler(apiSrv, orderItemsSrv)
 	usersHandler := handlers.NewUsersHandler(apiSrv, usersSrv)
 
 	api := engine.Group("/api")
@@ -79,6 +85,8 @@ func main() {
 	// Private routes.
 	api.Use(auth.Verify())
 	routers.NewCatalogsPrivateRouter(api, catalogsHandler)
+	routers.NewOrdersRouter(api, ordersHandler)
+	routers.NewOrderItemsRouter(api, orderItemsHandler)
 	routers.NewUsersRouter(api, usersHandler)
 
 	srv := &http.Server{
