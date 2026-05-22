@@ -7,11 +7,12 @@ import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Logo } from "@/components/Logo";
 import { AppleIcon, FacebookIcon, GoogleIcon } from "@/components/BrandIcons";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export type AuthMode = "sign-in" | "sign-up";
-
-const inputClass =
-  "w-full rounded-lg border border-black/15 bg-transparent px-3 py-2 text-sm outline-none transition focus:border-foreground focus:shadow-md dark:border-white/15";
 
 const copy: Record<
   AuthMode,
@@ -34,7 +35,7 @@ const copy: Record<
   },
   "sign-up": {
     title: "Create your account",
-    subtitle: "Get started with thecalda.",
+    subtitle: "Get started with TheCalda.",
     submit: "Create account",
     switchText: "Already have an account?",
     switchCta: "Sign in",
@@ -90,46 +91,40 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   return (
     <div className="flex flex-1 items-center justify-center px-6 py-12">
       <div className="w-full max-w-md">
-        <div className="rounded-2xl border border-black/10 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
+        <Card className="gap-0 p-8">
           <div className="flex flex-col items-center text-center">
-            <Link href="/" aria-label="thecalda home">
+            <Link href="/" aria-label="TheCalda home">
               <Logo orientation="vertical" />
             </Link>
             <h1 className="mt-6 text-xl font-semibold tracking-tight">
               {t.title}
             </h1>
-            <p className="mt-1 text-sm text-foreground/60">{t.subtitle}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{t.subtitle}</p>
           </div>
 
           {/* Social sign-in — UI only, not wired up yet. */}
           <div className="mt-6 flex flex-col gap-2.5">
             {socialProviders.map(({ name, Icon }) => (
-              <button
-                key={name}
-                type="button"
-                className="flex w-full items-center justify-center gap-2.5 rounded-lg border border-black/15 px-4 py-2.5 text-sm font-medium transition hover:bg-black/[0.03] dark:border-white/15 dark:hover:bg-white/5"
-              >
+              <Button key={name} type="button" variant="outline" size="lg">
                 <Icon className="size-5" />
                 Continue with {name}
-              </button>
+              </Button>
             ))}
           </div>
 
           <div className="my-6 flex items-center gap-3">
-            <span className="h-px flex-1 bg-black/10 dark:bg-white/10" />
-            <span className="text-xs uppercase tracking-wide text-foreground/40">
+            <span className="h-px flex-1 bg-border" />
+            <span className="text-xs uppercase tracking-wide text-muted-foreground">
               or
             </span>
-            <span className="h-px flex-1 bg-black/10 dark:bg-white/10" />
+            <span className="h-px flex-1 bg-border" />
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {mode === "sign-up" && (
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="fullName" className="text-sm font-medium">
-                  Full name
-                </label>
-                <input
+              <div className="grid gap-1.5">
+                <Label htmlFor="fullName">Full name</Label>
+                <Input
                   id="fullName"
                   type="text"
                   autoComplete="name"
@@ -137,16 +132,13 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
-                  className={inputClass}
                 />
               </div>
             )}
 
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="email" className="text-sm font-medium">
-                Email
-              </label>
-              <input
+            <div className="grid gap-1.5">
+              <Label htmlFor="email">Email</Label>
+              <Input
                 id="email"
                 type="email"
                 autoComplete="email"
@@ -154,16 +146,13 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className={inputClass}
               />
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="password" className="text-sm font-medium">
-                Password
-              </label>
+            <div className="grid gap-1.5">
+              <Label htmlFor="password">Password</Label>
               <div className="relative">
-                <input
+                <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   autoComplete={
@@ -174,45 +163,48 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
-                  className={`${inputClass} pr-10`}
+                  className="pr-10"
                 />
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon-sm"
                   onClick={() => setShowPassword((s) => !s)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-foreground/50 transition hover:text-foreground"
+                  className="absolute top-1/2 right-1 -translate-y-1/2 text-muted-foreground"
                 >
                   {showPassword ? (
-                    <EyeOff className="size-4" aria-hidden />
+                    <EyeOff aria-hidden />
                   ) : (
-                    <Eye className="size-4" aria-hidden />
+                    <Eye aria-hidden />
                   )}
-                </button>
+                </Button>
               </div>
             </div>
 
             {error && (
-              <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">
+              <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
                 {error}
               </p>
             )}
 
-            <button
+            <Button
               type="submit"
+              size="lg"
               disabled={loading}
               aria-label={t.submit}
-              className="mt-1 flex items-center justify-center rounded-lg bg-foreground px-4 py-2.5 text-sm font-medium text-background transition hover:opacity-90 disabled:opacity-50"
+              className="mt-1"
             >
               {loading ? (
-                <LoaderCircle className="size-5 animate-spin" aria-hidden />
+                <LoaderCircle className="animate-spin" aria-hidden />
               ) : (
                 t.submit
               )}
-            </button>
+            </Button>
           </form>
-        </div>
+        </Card>
 
-        <p className="mt-6 text-center text-sm text-foreground/60">
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           {t.switchText}{" "}
           <Link
             href={t.switchHref}

@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { StockIndicator } from "@/components/StockIndicator";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import type { CatalogWithItems } from "@/lib/types";
 
 export default async function CatalogPage({
@@ -41,51 +43,56 @@ export default async function CatalogPage({
               <li key={item.uid}>
                 <Link
                   href={`/catalog/${catalog.slug}/${item.slug}`}
-                  className="block overflow-hidden rounded-xl bg-black/5 transition hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10"
+                  className="block h-full"
                 >
-                  <div className="relative aspect-square bg-black/5 dark:bg-white/10">
-                    {primary && (
-                      <Image
-                        src={primary.url}
-                        alt={primary.alt ?? item.name}
-                        fill
-                        sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
-                        className="object-cover"
-                      />
-                    )}
-                    {item.discount > 0 && (
-                      <span className="absolute left-3 top-3 rounded-full bg-red-600 px-2.5 py-1 text-xs font-semibold text-white">
-                        -{Math.round(item.discount * 100)}%
-                      </span>
-                    )}
-                  </div>
-                  <div className="p-6">
-                    <h3 className="font-medium">{item.name}</h3>
-                    {item.description && (
-                      <p className="mt-1 line-clamp-2 text-sm text-foreground/60">
-                        {item.description}
-                      </p>
-                    )}
-                    <p className="mt-3 text-sm">
-                      {item.discount > 0 ? (
-                        <>
+                  <Card className="h-full gap-0 overflow-hidden py-0 transition-colors hover:bg-muted">
+                    <div className="relative aspect-square bg-muted">
+                      {primary && (
+                        <Image
+                          src={primary.url}
+                          alt={primary.alt ?? item.name}
+                          fill
+                          sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
+                          className="object-cover"
+                        />
+                      )}
+                      {item.discount > 0 && (
+                        <Badge
+                          variant="destructive"
+                          className="absolute left-3 top-3"
+                        >
+                          -{Math.round(item.discount * 100)}%
+                        </Badge>
+                      )}
+                    </div>
+                    <CardContent className="p-6">
+                      <h3 className="font-medium">{item.name}</h3>
+                      {item.description && (
+                        <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                          {item.description}
+                        </p>
+                      )}
+                      <p className="mt-3 text-sm">
+                        {item.discount > 0 ? (
+                          <>
+                            <span className="font-semibold">
+                              €{item.priceDiscounted.toFixed(2)}
+                            </span>{" "}
+                            <span className="text-muted-foreground line-through">
+                              €{item.price.toFixed(2)}
+                            </span>
+                          </>
+                        ) : (
                           <span className="font-semibold">
-                            €{item.priceDiscounted.toFixed(2)}
-                          </span>{" "}
-                          <span className="text-foreground/50 line-through">
                             €{item.price.toFixed(2)}
                           </span>
-                        </>
-                      ) : (
-                        <span className="font-semibold">
-                          €{item.price.toFixed(2)}
-                        </span>
-                      )}
-                    </p>
-                    <div className="mt-2">
-                      <StockIndicator stock={item.stock} />
-                    </div>
-                  </div>
+                        )}
+                      </p>
+                      <div className="mt-2">
+                        <StockIndicator stock={item.stock} />
+                      </div>
+                    </CardContent>
+                  </Card>
                 </Link>
               </li>
             );

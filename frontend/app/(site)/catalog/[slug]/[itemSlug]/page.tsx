@@ -74,7 +74,11 @@ export default async function ItemPage({
           </div>
 
           <div className="mt-6">
-            <AddToCartButton itemName={item.name} disabled={unavailable} />
+            <AddToCartButton
+              itemUid={item.uid}
+              itemName={item.name}
+              disabled={unavailable}
+            />
           </div>
 
           {item.description && (

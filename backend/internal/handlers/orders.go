@@ -133,3 +133,31 @@ func (h *OrdersHandler) Delete(ctx *gin.Context) {
 	}
 	h.apiSrv.SendNoContent(ctx)
 }
+
+// Checkout places one of the authenticated user's carts as an order.
+func (h *OrdersHandler) Checkout(ctx *gin.Context) {
+	authUserID, ok := middlewares.AuthUserID(ctx)
+	if !ok {
+		h.apiSrv.SendError(ctx, constants.ErrUnauthorized)
+		return
+	}
+
+	uid, err := uuid.Parse(ctx.Param("uid"))
+	if err != nil {
+		h.apiSrv.SendError(ctx, constants.ErrInvalidUID)
+		return
+	}
+
+	var req model.OrderCheckout
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		h.apiSrv.SendError(ctx, constants.ErrInvalidBody.WithDetails(err.Error()))
+		return
+	}
+
+	order, srvErr := h.ordersSrv.Checkout(ctx.Request.Context(), authUserID, uid, &req)
+	if srvErr != nil {
+		h.apiSrv.SendError(ctx, srvErr)
+		return
+	}
+	h.apiSrv.SendSuccess(ctx, order)
+}

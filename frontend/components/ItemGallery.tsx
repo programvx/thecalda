@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
 import type { ItemMedia } from "@/lib/types";
 
 /**
@@ -74,14 +75,14 @@ export function ItemGallery({
   );
 }
 
-/** DiscountBadge overlays a "-NN%" pill; renders nothing when there's no discount. */
+/** DiscountBadge overlays a "-NN%" badge; renders nothing when there's no discount. */
 function DiscountBadge({ discount }: { discount: number }) {
   if (discount <= 0) {
     return null;
   }
   return (
-    <span className="absolute right-3 top-3 rounded-full bg-red-600 px-3 py-1 text-sm font-semibold text-white">
+    <Badge variant="destructive" className="absolute right-3 top-3">
       -{Math.round(discount * 100)}%
-    </span>
+    </Badge>
   );
 }

@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { apiFetch } from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import type { Catalog } from "@/lib/types";
 
 export default async function HomePage() {
@@ -16,19 +23,18 @@ export default async function HomePage() {
     <div className="mx-auto w-full max-w-5xl px-6 py-16">
       <section>
         <h1 className="text-4xl font-semibold tracking-tight">
-          Welcome to thecalda
+          Welcome to TheCalda
         </h1>
         <p className="mt-3 max-w-prose text-foreground/70">
           A small demo storefront. Browse the collections below.
         </p>
-        <div className="mt-6">
-          <Link
-            href={user ? "/account" : "/auth/sign-in"}
-            className="inline-block rounded-md bg-foreground px-4 py-2 text-sm text-background"
-          >
-            {user ? "Go to your account" : "Get started"}
-          </Link>
-        </div>
+        {!user && (
+          <div className="mt-6">
+            <Button asChild>
+              <Link href="/auth/sign-in">Get started</Link>
+            </Button>
+          </div>
+        )}
       </section>
 
       <section className="mt-14">
@@ -46,14 +52,18 @@ export default async function HomePage() {
               <li key={category.uid}>
                 <Link
                   href={`/catalog/${category.slug}`}
-                  className="block min-h-44 rounded-xl bg-black/5 p-8 transition hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10"
+                  className="block h-full"
                 >
-                  <h3 className="text-lg font-medium">{category.name}</h3>
-                  {category.description && (
-                    <p className="mt-2 text-sm text-foreground/60">
-                      {category.description}
-                    </p>
-                  )}
+                  <Card className="h-full min-h-44 justify-center transition-colors hover:bg-muted">
+                    <CardHeader>
+                      <CardTitle className="text-lg">{category.name}</CardTitle>
+                      {category.description && (
+                        <CardDescription>
+                          {category.description}
+                        </CardDescription>
+                      )}
+                    </CardHeader>
+                  </Card>
                 </Link>
               </li>
             ))}

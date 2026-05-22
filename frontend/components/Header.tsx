@@ -3,6 +3,8 @@ import { LogIn } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Logo } from "@/components/Logo";
 import { UserMenu } from "@/components/UserMenu";
+import { CartButton } from "@/components/CartButton";
+import { Button } from "@/components/ui/button";
 
 /** Site header — shows auth state via a sign-in link or a user menu. */
 export async function Header() {
@@ -19,23 +21,25 @@ export async function Header() {
     : "";
 
   return (
-    <header>
-      <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-        <Link href="/" aria-label="thecalda home">
+    <header className="px-4 py-4">
+      <nav className="mx-auto flex max-w-5xl items-center justify-between gap-4 rounded-full border bg-card px-5 py-2.5 shadow-sm">
+        <Link href="/" aria-label="TheCalda home">
           <Logo />
         </Link>
 
-        <div className="flex items-center gap-4 text-sm">
+        <div className="flex items-center gap-3 text-sm">
           {user ? (
-            <UserMenu name={displayName} />
+            <>
+              <CartButton />
+              <UserMenu name={displayName} />
+            </>
           ) : (
-            <Link
-              href="/auth/sign-in"
-              className="flex items-center gap-1.5 rounded-md border border-black/15 px-3 py-1 hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
-            >
-              <LogIn className="size-4" aria-hidden />
-              Sign in
-            </Link>
+            <Button asChild variant="outline">
+              <Link href="/auth/sign-in">
+                <LogIn aria-hidden />
+                Sign in
+              </Link>
+            </Button>
           )}
         </div>
       </nav>

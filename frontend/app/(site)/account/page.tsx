@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { UserRound } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { apiFetch } from "@/lib/api";
+import { Card } from "@/components/ui/card";
 import type { User } from "@/lib/types";
 
 export default async function AccountPage() {
@@ -19,20 +20,20 @@ export default async function AccountPage() {
   return (
     <div className="mx-auto w-full max-w-2xl px-6 py-12">
       <h1 className="text-2xl font-semibold tracking-tight">Account</h1>
-      <p className="mt-1 text-sm text-foreground/60">
+      <p className="mt-1 text-sm text-muted-foreground">
         View your profile and account details.
       </p>
 
       {error && (
-        <p className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300">
+        <p className="mt-6 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           Could not load your profile: {error.message} (code {error.code})
         </p>
       )}
 
       {profile && (
-        <div className="mt-6 overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
-          <div className="flex items-center gap-4 border-b border-black/10 px-6 py-5 dark:border-white/10">
-            <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-foreground text-base font-semibold text-background">
+        <Card className="mt-6 gap-0 overflow-hidden py-0">
+          <div className="flex items-center gap-4 border-b border-border px-6 py-5">
+            <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-base font-semibold text-primary-foreground">
               {getInitials(profile.fullName) || (
                 <UserRound className="size-6" aria-hidden />
               )}
@@ -41,18 +42,18 @@ export default async function AccountPage() {
               <p className="truncate font-semibold">
                 {profile.fullName || "Unnamed user"}
               </p>
-              <p className="truncate text-sm text-foreground/60">
+              <p className="truncate text-sm text-muted-foreground">
                 {profile.email}
               </p>
             </div>
           </div>
 
-          <dl className="divide-y divide-black/5 dark:divide-white/5">
+          <dl className="divide-y divide-border">
             <Row label="User ID" value={profile.uid} mono />
             <Row label="Auth user ID" value={profile.authUserId} mono />
             <Row label="Member since" value={formatDate(profile.createdAt)} />
           </dl>
-        </div>
+        </Card>
       )}
     </div>
   );
@@ -69,7 +70,7 @@ function Row({
 }) {
   return (
     <div className="flex flex-col gap-0.5 px-6 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-      <dt className="text-sm text-foreground/55">{label}</dt>
+      <dt className="text-sm text-muted-foreground">{label}</dt>
       <dd
         className={
           mono

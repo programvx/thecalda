@@ -38,6 +38,10 @@ export async function apiFetch<T>(
       headers,
       cache: "no-store",
     });
+    // 204 No Content (e.g. DELETE) carries no body to parse.
+    if (res.status === 204) {
+      return {};
+    }
     return (await res.json()) as ApiResp<T>;
   } catch {
     return {

@@ -14,6 +14,7 @@ func NewOrdersRouter(r gin.IRouter, h *handlers.OrdersHandler) {
 	orders.GET("", h.List)
 	orders.GET("/:uid", h.Get)
 	orders.POST("", h.Create)
+	orders.POST("/:uid/checkout", h.Checkout)
 	orders.PUT("/:uid", h.Update)
 	orders.DELETE("/:uid", h.Delete)
 }

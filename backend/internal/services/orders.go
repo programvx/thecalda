@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -40,6 +41,7 @@ type OrdersSrv interface {
 	GetByUID(ctx context.Context, authUserID, uid uuid.UUID) (*model.Order, *model.Err)
 	Update(ctx context.Context, authUserID, uid uuid.UUID, req *model.OrderUpdate) (*model.Order, *model.Err)
 	Delete(ctx context.Context, authUserID, uid uuid.UUID) *model.Err
+	Checkout(ctx context.Context, authUserID, uid uuid.UUID, req *model.OrderCheckout) (*model.Order, *model.Err)
 }
 
 type ordersSrv struct {
@@ -220,4 +222,59 @@ func (s *ordersSrv) fail(op string, err error) *model.Err {
 	}
 	s.log.Error(op+" failed", zap.Error(err))
 	return constants.ErrInternal
+}
+
+// Checkout places one of the user's carts as an order: it persists the
+// billing/shipping addresses and payment method, assigns an order number, and
+// transitions the cart into an order.
+func (s *ordersSrv) Checkout(ctx context.Context, authUserID, uid uuid.UUID, req *model.OrderCheckout) (*model.Order, *model.Err) {
+	userID, srvErr := s.resolveUserID(ctx, authUserID)
+	if srvErr != nil {
+		return nil, srvErr
+	}
+
+	order, err := s.orders.GetByUID(ctx, userID, uid)
+	if err != nil {
+		return nil, s.fail("load order for checkout", err)
+	}
+	if order.Type != orderTypeCart {
+		return nil, constants.ErrInvalidBody.WithDetails("order is not an open cart")
+	}
+	if len(order.Items) == 0 {
+		return nil, constants.ErrInvalidBody.WithDetails("cannot check out an empty cart")
+	}
+
+	shipping := addressFromInput(req.Email, &req.ShippingAddress)
+	var billing *model.Address
+	if req.BillingAddress != nil {
+		billing = addressFromInput(req.Email, req.BillingAddress)
+	}
+
+	orderNumber := fmt.Sprintf("ORD-%05d", order.ID)
+
+	if err := s.orders.Checkout(ctx, order.ID, shipping, billing, req.PaymentMethodCode, orderNumber, req.Note); err != nil {
+		return nil, s.fail("check out order", err)
+	}
+
+	placed, err := s.orders.GetByUID(ctx, userID, uid)
+	if err != nil {
+		return nil, s.fail("reload placed order", err)
+	}
+	return placed, nil
+}
+
+// addressFromInput builds an Address from a checkout AddressInput, attaching
+// the shared contact email.
+func addressFromInput(email string, in *model.AddressInput) *model.Address {
+	return &model.Address{
+		FirstName:    in.FirstName,
+		LastName:     in.LastName,
+		Email:        email,
+		Phone:        in.Phone,
+		AddressLine1: in.AddressLine1,
+		AddressLine2: in.AddressLine2,
+		PostalCode:   in.PostalCode,
+		City:         in.City,
+		Country:      in.Country,
+	}
 }

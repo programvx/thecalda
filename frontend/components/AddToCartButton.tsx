@@ -1,46 +1,36 @@
 "use client";
 
-import { useState } from "react";
-import { Check, ShoppingCart } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useCart } from "@/components/CartProvider";
 
 /**
- * AddToCartButton is a placeholder cart action. The cart itself is not built
- * yet (Phase 2 covers the catalog only); the button gives local click feedback
- * so it reads as interactive. It is disabled when the item is unavailable.
+ * AddToCartButton adds a catalog item to the cart and opens the cart panel.
+ * It is disabled when the item is unavailable to buy, or while its own add is
+ * in flight (cart-line edits in the panel do not disable it).
  */
 export function AddToCartButton({
+  itemUid,
   itemName,
   disabled = false,
 }: {
+  itemUid: string;
   itemName: string;
   disabled?: boolean;
 }) {
-  const [added, setAdded] = useState(false);
-
-  function handleClick() {
-    setAdded(true);
-    window.setTimeout(() => setAdded(false), 2000);
-  }
+  const { addItem, addPending } = useCart();
 
   return (
-    <button
+    <Button
       type="button"
-      onClick={handleClick}
-      disabled={disabled}
+      size="lg"
+      onClick={() => addItem(itemUid)}
+      disabled={disabled || addPending}
       aria-label={`Add ${itemName} to cart`}
-      className="flex w-full items-center justify-center gap-2 rounded-lg bg-foreground px-5 py-3 text-sm font-medium text-background transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+      className="w-full sm:w-auto"
     >
-      {added ? (
-        <>
-          <Check className="size-4" aria-hidden />
-          Added to cart
-        </>
-      ) : (
-        <>
-          <ShoppingCart className="size-4" aria-hidden />
-          Add to cart
-        </>
-      )}
-    </button>
+      <ShoppingCart />
+      Add to cart
+    </Button>
   );
 }

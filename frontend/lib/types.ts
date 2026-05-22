@@ -77,3 +77,83 @@ export type Item = {
 export type CatalogWithItems = Catalog & {
   items: Item[];
 };
+
+/** Mirrors the backend `model.OrderItem` JSON shape — one line of an order.
+ *  `item` is the linked catalog item; only its media is relied on here. */
+export type OrderItem = {
+  uid: string;
+  itemName: string;
+  quantity: number;
+  unitPrice: number;
+  unitDiscount: number;
+  unitPriceDiscounted: number;
+  lineTotal: number;
+  item: { medias: ItemMedia[] } | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** Mirrors the backend `model.Address` JSON shape. */
+export type Address = {
+  uid: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string | null;
+  addressLine1: string;
+  addressLine2: string | null;
+  postalCode: string;
+  city: string;
+  country: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** Mirrors the backend `model.PaymentMethod` JSON shape. */
+export type PaymentMethod = {
+  uid: string;
+  code: string;
+  name: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** Mirrors the backend `model.Order` JSON shape. A cart is an order with
+ *  type "cart". The address / payment fields are null for carts. */
+export type Order = {
+  uid: string;
+  type: "cart" | "order";
+  status: string;
+  totalAmount: number;
+  orderNumber: string | null;
+  notes: string | null;
+  placedAt: string | null;
+  billingAddress: Address | null;
+  shippingAddress: Address | null;
+  paymentMethod: PaymentMethod | null;
+  items: OrderItem[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** One postal address in a checkout request. */
+export type CheckoutAddress = {
+  firstName: string;
+  lastName: string;
+  phone: string | null;
+  addressLine1: string;
+  addressLine2: string | null;
+  city: string;
+  postalCode: string;
+  country: string;
+};
+
+/** Request body for checking out a cart (POST /api/orders/:uid/checkout). */
+export type CheckoutPayload = {
+  email: string;
+  note: string | null;
+  paymentMethodCode: string;
+  shippingAddress: CheckoutAddress;
+  billingAddress: CheckoutAddress | null;
+};

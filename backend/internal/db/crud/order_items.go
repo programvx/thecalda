@@ -40,6 +40,7 @@ func (c *orderItemsCrud) ListByOrder(ctx context.Context, orderID int64) ([]mode
 	if err := c.store.DB.WithContext(ctx).
 		Where("order_id = ?", orderID).
 		Order("id").
+		Preload("Item.Medias", preloadMedias).
 		Find(&items).Error; err != nil {
 		return nil, translateError(err)
 	}
@@ -53,6 +54,7 @@ func (c *orderItemsCrud) GetByUID(ctx context.Context, userID int64, uid uuid.UU
 	if err := c.store.DB.WithContext(ctx).
 		Joins("JOIN orders o ON o.id = order_items.order_id").
 		Where("order_items.uid = ? AND o.user_id = ?", uid, userID).
+		Preload("Item.Medias", preloadMedias).
 		First(&item).Error; err != nil {
 		return nil, translateError(err)
 	}

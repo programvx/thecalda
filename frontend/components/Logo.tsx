@@ -1,6 +1,6 @@
 import { ShoppingBag } from "lucide-react";
 
-/** thecalda brand logo — icon mark plus wordmark, laid out horizontally or stacked. */
+/** TheCalda brand logo — icon mark plus wordmark, laid out horizontally or stacked. */
 export function Logo({
   orientation = "horizontal",
 }: {
@@ -17,7 +17,7 @@ export function Logo({
       <span className="flex size-8 items-center justify-center rounded-lg bg-foreground text-background">
         <ShoppingBag className="size-5" aria-hidden />
       </span>
-      <span className="text-lg font-semibold tracking-tight">thecalda</span>
+      <span className="text-lg font-semibold tracking-tight">TheCalda</span>
     </span>
   );
 }
